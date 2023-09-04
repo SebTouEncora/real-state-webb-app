@@ -24,11 +24,11 @@ function cacheComponent(Component: any) {
     </div>
   </header>
 
-  <RouterView v-slot="{ Component, route }">
+  <RouterView v-slot="{ Component, route }" class="component">
     <template v-if="Component">
       <KeepAlive>
         <Suspense>
-          <component :is="Component"/>
+          <component :is="Component" />
           <template #fallback>
             <SkeletonLoading />
           </template>
@@ -98,6 +98,9 @@ header {
   margin-bottom: 0;
   font-size: 13px;
   list-style: none;
+}
+.component{
+  padding: 85px;
 }
 
 #header .menu li {

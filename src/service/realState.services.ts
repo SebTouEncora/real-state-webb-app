@@ -1,6 +1,7 @@
 import ApiService from "@/service/ApiService";
 import type {Building, BuildingRecord, Response} from "@/models/model/record";
 import type {AxiosResponse} from "axios";
+import type {RequestMicroLoan} from "@/models/model/requestMicroLoan";
 
 export default class RealStateService extends ApiService{
 
@@ -13,5 +14,9 @@ export default class RealStateService extends ApiService{
 
     async registerNewConstruction(building: Building): Promise<AxiosResponse> {
         return (await this.post("/edificios", building));
+    }
+
+    async requestMicroLoan(microLoan: RequestMicroLoan): Promise<AxiosResponse>{
+        return (await this.post('/microloan', microLoan));
     }
 }
