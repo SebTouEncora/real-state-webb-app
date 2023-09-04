@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import RequestMicroLoan from "@/views/RequestMicroLoan.vue";
+import ApproveLoan from "@/views/ApproveLoan.vue";
 
 
 const router = createRouter({
@@ -13,16 +14,23 @@ const router = createRouter({
     },
     {
       path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
+      name: 'New Building',
       component: () => import('../views/BuildingRecord.vue')
     },
     {
       path: '/loan',
-      name: 'MicroLoan',
-      component: RequestMicroLoan
+      name: 'Request MicroLoan',
+      component: () => import('../views/RequestMicroLoan.vue')
+    },
+    {
+      path: '/approve',
+      name: 'Approve MicroLoan',
+      component: () => import('@/views/ApproveLoan.vue')
+    },
+    {
+      path: '/invert',
+      name: 'Invert',
+      component: () => import('@/views/Invert.vue')
     },
   ]
 })
