@@ -1,6 +1,6 @@
 <template>
   <div class="loan-cnt">
-    <loan-form :available-constructions="buildings"/>
+    <LoanForm :available-constructions="buildings" />
   </div>
 </template>
 
@@ -10,6 +10,9 @@ import LoanForm from "@/components/microLoan/loanForm.vue";
 import controllerFacade from "@/models/facade/controllerFacade";
 import {ref} from "vue";
 import type {BuildingRecord} from "@/models/model/record";
+import type {MicroLoan} from "@/models/model/microLoan";
+
+
 
 const buildings: BuildingRecord = await controllerFacade.getAllConstructions();
 </script>

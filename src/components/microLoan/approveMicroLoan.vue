@@ -1,88 +1,122 @@
 <template>
   <div class="form-container">
-    <Card title="Futuristic Form" class="futuristic-form">
-      <form @submit.prevent="handleSubmit">
-        <div class="p-field">
-          <label for="status">Status</label>
-          <Dropdown id="status" v-model="formData.status" :options="statuses" placeholder="Select a Status"/>
+    <Toast style="margin-top: 35px" />
+    <div v-if="!loading" class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+      <div class="text-center mb-5">
+        <div class="text-900 text-3xl font-medium mb-3">Approve Requested Loan</div>
+      </div>
+
+      <form class="form-content" @submit.prevent="handleSubmit">
+        <div class="field">
+          <label class="text-900 font-medium" for="status">Status</label>
+          <Dropdown id="status" v-model="formData.status" :options="statuses" class="w-full"
+                    option-value="code" optionLabel="name" placeholder="Select a Status"/>
         </div>
 
-        <div class="p-field">
-          <label for="code">Code</label>
-          <InputText id="code" v-model="formData.code" placeholder="Enter Code"/>
+        <div class="field">
+          <label class="text-900 font-medium" for="code">Code</label>
+          <InputText id="code" v-model="formData.code" class="w-full" placeholder="Enter Code"/>
         </div>
 
-        <div class="p-field">
-          <label for="minimunInvestment">Minimum Investment</label>
-          <InputText id="minimunInvestment" v-model="formData.minimunInvestment" mode="currency" currency="USD" locale="en-US"/>
+        <div class="field">
+          <label class="text-900 font-medium" for="minimunInvestment">Minimum Investment</label>
+          <InputText id="minimunInvestment" v-model="formData.minimunInvestment" class="w-full" currency="USD"
+                     locale="en-US" mode="currency"/>
         </div>
 
-        <div class="p-field">
-          <label for="risk">Risk</label>
-          <Dropdown id="risk" v-model="formData.risk" :options="risks" placeholder="Select Risk Level"/>
+        <div class="field">
+          <label class="text-900 font-medium" for="risk">Risk</label>
+          <Dropdown id="risk" v-model="formData.risk" :options="risks" class="w-full" option-value="code"
+                    optionLabel="name" placeholder="Select Risk Level"/>
         </div>
 
-        <div class="p-field">
-          <label for="microLoanCode">Micro Loan Code</label>
-          <InputText id="microLoanCode" v-model="formData.microLoanCode" placeholder="Enter Micro Loan Code"/>
+        <div class="field">
+          <label class="text-900 font-medium" for="microLoanCode">Micro Loan Code</label>
+          <InputText disabled id="microLoanCode" v-model="formData.microLoanCode" class="w-full"
+                     placeholder="Enter Micro Loan Code"/>
         </div>
 
-        <Button type="submit" label="Submit" icon="pi pi-check" class="p-mt-3"/>
+        <Button class="w-full p-mt-3" icon="pi pi-check" label="Submit" style="margin-top:15px" type="submit"/>
       </form>
-    </Card>
+    </div>
+    <div v-else class="card flex justify-content-center">
+      <ProgressSpinner />
+    </div>
   </div>
 </template>
-<script setup lang="ts">
 
-import {ref} from "vue";
+<script lang="ts" setup>
+import {Ref, ref, UnwrapRef} from "vue";
+import type {MicroLoan} from "@/models/model/microLoan";
+import type {RequestOportunityInvestment} from "@/models/model/oportunityInvestment";
+import controllerFacade from "@/models/facade/controllerFacade";
+import {useToast} from "primevue/usetoast";
+import SkeletonLoading from "@/App.vue";
 
-const formData = ref({
-  status: "Approved",
-  code: "nuevo-005",
-  minimunInvestment: 500,
-  risk: "bajo",
-  microLoanCode: "nuevo-00004"
+const props = defineProps<{
+  loan: MicroLoan
+}>();
+
+const toast = useToast();
+const loading = ref(false);
+const formData : Ref<UnwrapRef<RequestOportunityInvestment>> = ref<RequestOportunityInvestment>({
+  status: "",
+  code: "",
+  minimunInvestment: 0,
+  risk: "",
+  microLoanCode: props.loan.code
 });
 
-const statuses = [
-  { label: 'Approved', value: 'Approved' },
-  { label: 'Pending', value: 'Pending' },
-  { label: 'Rejected', value: 'Rejected' }
-];
+const statuses = ref([
+  {name: 'Approved', code: 'Approved'},
+  {name: 'Pending', code: 'Pending'},
+  {name: 'Rejected', code: 'Rejected'}
+]);
 
 const risks = [
-  { label: 'Low', value: 'bajo' },
-  { label: 'Medium', value: 'medio' },
-  { label: 'High', value: 'alto' }
+  {name: 'Low', code: 'bajo'},
+  {name: 'Medium', code: 'medio'},
+  {name: 'High', code: 'alto'}
 ];
 
-const handleSubmit = () => {
-  console.log(formData.value);
-  // Aquí puedes agregar la lógica para manejar el envío del formulario
-};
+const emits = defineEmits<{
+  (e: 'approve', data: RequestOportunityInvestment): void;
+}>();
 
+const handleSubmit = async () => {
+  loading.value = true;
+  const response = await controllerFacade.createOportunityInvestment(formData.value);
+  loading.value = false;
+  if (response.status.toString().startsWith('2')) {
+    toast.add({severity: 'success', summary: 'Registered', detail: 'Building registered succesfully', life: 5000});
+  } else {
+    toast.add({severity: 'error', summary: 'Error while registering', detail: `${response.statusText}`, life: 3000});
+    window.location.reload();
+  }
+  emits('approve', formData.value);
+  console.log({response})
+};
 </script>
 
 <style scoped>
 .form-container {
   display: flex;
-  justify-content: center;
+  justify-content: left;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+
+  background-color: transparent;
+  width: 55vw;
 }
 
-.futuristic-form {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
+.form-content {
+  display: grid;
+  gap: 1rem;
+  grid-auto-rows: 4rem;
+  grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
 }
 
-@media (max-width: 600px) {
-  .futuristic-form {
-    padding: 1rem;
-  }
+.field {
+  display: flex;
+  flex-direction: column;
 }
 </style>

@@ -1,94 +1,55 @@
 <template>
-  <div class="form-container">
-    <Card title="Futuristic Form" class="futuristic-form">
-      <template #content>
-        <form @submit.prevent="handleSubmit">
-          <div class="p-field">
-            <label for="status">Status</label>
-            <Dropdown id="status" v-model="formData.status" :options="statuses" placeholder="Select a Status"/>
-          </div>
-
-          <div class="p-field">
-            <label for="code">Code</label>
-            <InputText id="code" v-model="formData.code" placeholder="Enter Code"/>
-          </div>
-
-          <div class="p-field">
-            <label for="minimunInvestment">Minimum Investment</label>
-            <InputText id="minimunInvestment" v-model="formData.minimunInvestment" mode="currency" currency="USD"
-                       locale="en-US"/>
-          </div>
-
-          <div class="p-field">
-            <label for="risk">Risk</label>
-            <Dropdown id="risk" v-model="formData.risk" :options="risks" placeholder="Select Risk Level"/>
-          </div>
-
-          <div class="p-field">
-            <label for="microLoanCode">Micro Loan Code</label>
-            <InputText id="microLoanCode" v-model="formData.microLoanCode" placeholder="Enter Micro Loan Code"/>
-          </div>
-
-          <Button type="submit" label="Submit" icon="pi pi-check" class="p-mt-3"/>
-        </form>
-      </template>
-    </Card>
+  <div class="gallery-cnt">
+  <div class="galleryxxx">
+      <MicroLoanCard v-for="loan in loans.response" :key="loan.key" @select="onLoanSelected"  :micro-loan="loan.Record" />
+  </div>
+    <div>
+      <Dialog style="margin-top: 70px !important;" v-model:visible="openModal" modal header="Enter Investment detail" :style="{ width: '40vw', height: '90vh' }">
+        <approve-micro-loan :loan="loanSelected" @approve="onLoanApproved"/>
+      </Dialog>
+    </div>
   </div>
 </template>
 
-
 <script setup lang="ts">
+import {Response} from "@/models/model/record";
+import controllerFacade from "@/models/facade/controllerFacade";
+import type {MicroLoan} from "@/models/model/microLoan";
+import MicroLoanCard from "@/components/microLoan/microLoanCard.vue";
+import {Ref, ref, UnwrapRef} from "vue";
+import ApproveMicroLoan from "@/components/microLoan/approveMicroLoan.vue";
+import type {RequestOportunityInvestment} from "@/models/model/oportunityInvestment";
+await controllerFacade.getAllMicroLoansCreated()
+//const loans: Response<MicroLoan> = await controllerFacade.getAllMicroLoansCreated();
+const loans: Ref<UnwrapRef<MicroLoan>>  = ref<Response<MicroLoan>>(controllerFacade.microLoansAvailable);
+console.log(loans.value)
 
+const openModal = ref(false);
+const loanSelected = ref();
 
-import {ref} from "vue";
+const onLoanSelected = (loan: MicroLoan) => {
+  openModal.value = true;
+  loanSelected.value = loan;
+}
 
-const formData = ref({
-  status: "Approved",
-  code: "nuevo-005",
-  minimunInvestment: 500,
-  risk: "bajo",
-  microLoanCode: "nuevo-00004"
-});
-
-const statuses = [
-  {label: 'Approved', value: 'Approved'},
-  {label: 'Pending', value: 'Pending'},
-  {label: 'Rejected', value: 'Rejected'}
-];
-
-const risks = [
-  {label: 'Low', value: 'bajo'},
-  {label: 'Medium', value: 'medio'},
-  {label: 'High', value: 'alto'}
-];
-
-const handleSubmit = () => {
-  console.log(formData.value);
-  // Aquí puedes agregar la lógica para manejar el envío del formulario
-};
+const onLoanApproved = async (data: RequestOportunityInvestment) => {
+  openModal.value = false;
+  await controllerFacade.getAllMicroLoansCreated();
+  loans.value = controllerFacade.microLoansAvailable;
+}
 </script>
 
 <style scoped>
-.form-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: max-content;
-  background: linear-gradient(120deg, #8ca693 0%, #b9dff5 100%);
+.galleryxxx {
+  display: grid;
+  gap: 1rem;
+  grid-auto-flow: dense;
+  grid-auto-rows: 15rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
 }
 
-.futuristic-form {
-  width: 100%;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 15px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
-}
 
-@media (max-width: 600px) {
-  .futuristic-form {
-    padding: 1rem;
-  }
+.gallery-cnt{
+  width: 80vw
 }
 </style>

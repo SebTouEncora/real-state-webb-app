@@ -28,7 +28,7 @@
                    type="number"/>
 
         <label class="block text-900 font-medium mb-2" for="pnc">Promissory detail codes</label>
-        <Chips id="pnc" v-model="requestMicroLoan.promissoryDetail[0]" class="w-full mb-3"/>
+        <Chips id="pnc" v-model="requestMicroLoan.promissoryDetail" class="w-full mb-3"/>
       </div>
       <div v-else>
         <SkeletonLoading/>
