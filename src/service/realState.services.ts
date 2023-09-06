@@ -10,8 +10,8 @@ export default class RealStateService extends ApiService{
     constructor() {
         super({ baseURL: "http://localhost:3004" });
     }
-    async getConstructions(): Promise<BuildingRecord>{
-        return (await this.get("/edificios")).data;
+    async getConstructions(): Promise<AxiosResponse>{
+        return (await this.get("/edificios"));
     }
 
     async registerNewConstruction(building: Building): Promise<AxiosResponse> {
@@ -28,5 +28,9 @@ export default class RealStateService extends ApiService{
 
     async createOportunityInvestment(oportunityInvestment: RequestOportunityInvestment): Promise<AxiosResponse>{
         return (await this.post('/micro-loan-status/', oportunityInvestment));
+    }
+
+    async getAllApprovedOportunityInvestments(): Promise<AxiosResponse>{
+        return (await this.get('/oportunity-investment'));
     }
 }

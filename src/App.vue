@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import {RouterLink, RouterView, useRouter} from 'vue-router'
+import { RouterLink, RouterView, useRouter } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
-import {ref} from "vue";
+import { ref } from "vue";
 import SkeletonLoading from "@/components/SkeletonLoading.vue";
+import SkeletonCardsGallery from './components/SkeletonCardsGallery.vue';
 
 const routes = useRouter().getRoutes();
 
@@ -26,22 +27,21 @@ function cacheComponent(Component: any) {
 
   <RouterView v-slot="{ Component, route }" class="component">
     <template v-if="Component">
-      <KeepAlive>
+      <!-- <KeepAlive> -->
         <Suspense>
           <component :is="Component" />
           <template #fallback>
-            <SkeletonLoading />
+            <SkeletonLoading v-if="!route.meta.cardLoading"/>
+            <SkeletonCardsGallery v-else />
           </template>
         </Suspense>
-      </KeepAlive>
+      <!-- </KeepAlive> -->
     </template>
   </RouterView>
  
 </template>
 
 <style scoped>
-
-
 .logo {
   display: block;
   margin: 0 auto 2rem;
@@ -99,7 +99,8 @@ header {
   font-size: 13px;
   list-style: none;
 }
-.component{
+
+.component {
   padding: 85px;
 }
 
@@ -130,7 +131,4 @@ header {
   font-family: 'Coiny', sans-serif;
   font-variant: small-caps;
 }
-
-
-
 </style>
