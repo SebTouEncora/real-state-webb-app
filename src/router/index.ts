@@ -24,6 +24,16 @@ const router = createRouter({
       name: 'MicroLoan',
       component: RequestMicroLoan
     },
+    {
+      path: '/promisoryNote',
+      name: 'PromisoryNote',
+      component: () => import('../views/PromisoryNote.vue') 
+    },
+    {
+      path: '/bankMicroLoan',
+      name: 'BankMicroLoan',
+      component: () => import('../views/BankMicroLoan.vue') 
+    }
   ]
 })
 
