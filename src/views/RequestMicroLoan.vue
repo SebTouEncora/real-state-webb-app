@@ -1,6 +1,7 @@
 <template>
   <div class="loan-cnt">
-    <loan-form :available-constructions="buildings"/>
+    <SkeletonLoading v-if="isLoading" />
+    <LoanForm v-if="buildings != null" :available-constructions="buildings" />
   </div>
 </template>
 
@@ -8,8 +9,9 @@
 
 import LoanForm from "@/components/microLoan/loanForm.vue";
 import controllerFacade from "@/models/facade/controllerFacade";
-import {ref} from "vue";
+import { ref, onMounted, Ref } from 'vue';
 import type {BuildingRecord} from "@/models/model/record";
+
 const buildings: BuildingRecord = {
 
 response: [
@@ -37,10 +39,16 @@ response: [
      }
     ]
 }
-//const buildings: BuildingRecord = await controllerFacade.getAllConstructions();
+
 </script>
 <style scoped>
 .loan-cnt{
   min-width: 45vw;
+}
+div {
+  display: flex;
+  justify-content: center;
+  align-items: center;  
+  margin-top: 50px;
 }
 </style>

@@ -1,48 +1,61 @@
 <template>
-  <div class="surface-card  shadow-2 border-round w-full lg:w-8">
-    <div class="text-center mb-5">
-      <div class="text-900 text-3xl font-medium mb-3">Register new construction</div>
+  <div class="cnt">
+    <div  class="surface-card shadow-2 border-round w-full lg:w-8">
+
+      <div class="cnt-act" v-if="!loading">
+        <div class="text-center mb-5">
+        <div class="text-900 text-3xl font-medium mb-3">Register new construction</div>
+      </div>
+        <label class="text-900 font-medium" for="company">Company ID</label>
+        <InputText id="company" v-model="building.companyId" type="text" placeholder="Company ID"/>
+
+        <label class="text-900 font-medium" for="status">Project Status</label>
+        <Dropdown id="status" v-model="building.projectStatus" :options="status" class="w-full md:w-14rem"
+                  optionLabel="name" placeholder="Select a Status"/>
+
+        <label class="text-900 font-medium" for="location">Location</label>
+        <div>
+          <InputText id="location" style="margin-right: 10px" v-model="building.location.latitude" placeholder="Latitude" type="text"/>
+          <InputText id="location2" style="margin-left: 10px"  v-model="building.location.longitude" placeholder="Longitude" type="text"/>
+        </div>
+
+        <label class="text-900 font-medium" for="area">Area</label>
+        <div>
+          <InputText style="margin-right: 10px" id="area" v-model="building.area.buildArea" placeholder="Land Area" type="text"/>
+          <InputText  style="margin-left: 10px" id="area2" v-model="building.area.landArea" placeholder="Build Area" type="text"/>
+        </div>
+
+
+        <label class="text-900 font-medium" for="value">Amount</label>
+        <div>
+          <Dropdown style="margin-right: 10px" v-model="building.value.currency" :options="currencies" class="w-full md:w-14rem"
+                    optionLabel="name" placeholder="Select a Status"/>
+          <InputText  style="margin-left: 10px" id="area2" v-model="building.value.amount" placeholder="Amount" type="string"/>
+
+        </div>
+      </div>
+      <div v-else>
+        <SkeletonLoading/>
+      </div>
+      <Button class="w-full" icon="pi pi-save" label="Register" @click="saveBuilding"></Button>
     </div>
 
-    <div class="cnt-act">
-
-      <label for="company" class="text-900 font-medium">Company ID</label>
-      <InputText id="company" v-model="building.companyId" type="text"/>
-
-
-      <label for="status" class="text-900 font-medium">Proyect Status</label>
-      <Dropdown id="status" v-model="building.projectStatus" :options="status" optionLabel="name"
-                placeholder="Select a Status" class="w-full md:w-14rem"/>
-
-      <div>
-        <label for="location" class="text-900 font-medium">Location</label>
-        <InputText id="location" v-model="building.location.latitude" type="text" placeholder="Latitude"/>
-        <InputText id="location2" v-model="building.location.longitude" type="text" placeholder="Longitude"/>
-      </div>
-      <div>
-        <label for="area" class="text-900 font-medium">Area</label>
-        <InputText id="area" v-model="building.area.buildArea" type="text" placeholder="Land Area"/>
-        <InputText id="area2" v-model="building.area.landArea" type="text" placeholder="Build Area"/>
-      </div>
-
-      <div>
-        <label for="value" class="text-900 font-medium">Amount</label>
-        <Dropdown v-model="building.value.currency" :options="currencies" optionLabel="name"
-                  placeholder="Select a Status"
-                  class="w-full md:w-14rem"/>
-        <InputText id="area2" v-model="building.value.amount" type="string" placeholder="Amount"/>
-      </div>
-    </div>
-
-    <Button label="Register" @click="saveBuilding" icon="pi pi-save" class="w-full"></Button>
+    <Toast style="margin-top: 50px"/>
   </div>
 </template>
 
-<script setup lang="ts">
-import {reactive, ref} from 'vue';
+
+
+<script lang="ts" setup>
 import type {Ref, UnwrapRef} from 'vue';
+import {ref} from 'vue';
 import type {Building} from '@/models/model/record';
 import controllerFacade from "@/models/facade/controllerFacade";
+import {useToast} from "primevue/usetoast";
+import SkeletonLoading from "@/components/SkeletonLoading.vue";
+
+const loading = ref(false);
+const toast = useToast();
 
 const building: Ref<UnwrapRef<Building>> = ref<Building>({
   certified: false, companyId: "", docType: "", id: "", projectStatus: "",
@@ -60,7 +73,6 @@ const building: Ref<UnwrapRef<Building>> = ref<Building>({
   }
 })
 
-const selectedStatus = ref();
 const status = ref([
   {name: 'En Planos', code: 'planos'},
   {name: 'En Construccion', code: 'construction'},
@@ -74,17 +86,26 @@ const currencies = ref([
 ]);
 
 const saveBuilding = async () => {
+  loading.value = true;
   console.log(building.value)
   const response = await controllerFacade.createNewConstruction(building.value);
-  console.log({response})
+  if (response.status.toString().startsWith('2')) {
+    toast.add({severity: 'success', summary: 'Registered', detail: 'Building registered succesfully', life: 5000});
+  } else {
+    toast.add({severity: 'error', summary: 'Error while registering', detail: `${response.statusText}`, life: 3000});
+  }
+  loading.value = false;
 }
 </script>
 
 <style scoped>
 .cnt-act {
+  margin: 20px;
   display: grid;
   gap: 1rem;
-  grid-auto-rows: 4rem;
-  grid-template-columns: repeat(auto-fill, minmax(25rem, 1fr));
+  grid-auto-rows: 2.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr));
+  height: 80vh
 }
+
 </style>
