@@ -38,6 +38,16 @@ const router = createRouter({
         cardLoading: true
       }
     },
+    {
+      path: '/promisoryNote',
+      name: 'PromisoryNote',
+      component: () => import('../views/PromisoryNote.vue') 
+    },
+    {
+      path: '/bankMicroLoan',
+      name: 'BankMicroLoan',
+      component: () => import('../views/BankMicroLoan.vue') 
+    }
   ]
 })
 
